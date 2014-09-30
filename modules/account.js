@@ -39,7 +39,7 @@ Account.get = function(username, callback) {
 			return  callback(err);
 		}
 		// 读取 users 集合
-		db.collection('users', function(err, collection) {
+		db.collection('account', function(err, collection) {
 			if (err) {
 				mongodb.close();
 				return  callback(err);
@@ -49,7 +49,7 @@ Account.get = function(username, callback) {
 				mongodb.close();
 				if (doc) {
 					//  封装文档为 User 对象
-					var  user =  new  User(doc);
+					var user =  new Account(doc);
 					callback(err, user);
 				} else {
 					callback(err, null);

@@ -26,8 +26,8 @@ Account.prototype.save = function(callback) {
 
 			collection.ensureIndex('name', {unique: true});
 			collection.insert(a, {safe: true}, function(err, account) {
-				mongodb.close();
 				callback(err, account);
+				//mongodb.close();
 			})
 		});
 	});

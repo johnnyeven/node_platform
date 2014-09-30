@@ -16,16 +16,16 @@ module.exports = function(req, res) {
 			err = 'Username already exist.';
 		}
 		if(err) {
-			req.flash('error', err);
+			//req.flash('error', err);
 			return res.redirect('/register');
 		}
 
 		newAccount.save(function(err) {
 			if(err) {
-				req.flash('error', err);
+				//req.flash('error', err);
 				return res.redirect('/register');
 			}
-			req.flash('success', 'Register success!');
+			//req.flash('success', 'Register success!');
 			res.redirect('/');
 		});
 	});

@@ -17,7 +17,8 @@ module.exports = function(req, res) {
 		}
 		if(err) {
 			//req.flash('error', err);
-			return res.redirect('/register');
+			console.log(err);
+			return res.redirect('/register123');
 		}
 
 		newAccount.save(function(err) {

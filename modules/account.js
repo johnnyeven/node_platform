@@ -24,16 +24,16 @@ Account.prototype.save = function(callback) {
 				return callback(err);
 			}
 
-			collection.ensureIndex('name', {unique: true});
+			//collection.ensureIndex('name', {unique: true});
 			collection.insert(a, {safe: true}, function(err, account) {
 				callback(err, account);
-				//mongodb.close();
+				mongodb.close();
 			})
 		});
 	});
 };
 
-Account.prototype.get = function(username, callback) {
+Account.get = function(username, callback) {
 	mongodb.open(function(err, db) {
 		if (err) {
 			return  callback(err);

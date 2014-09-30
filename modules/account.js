@@ -33,7 +33,7 @@ Account.prototype.save = function(callback) {
 	});
 };
 
-Account.get = function(username, callback) {
+Account.prototype.get = function(username, callback) {
 	mongodb.open(function(err, db) {
 		if (err) {
 			return  callback(err);

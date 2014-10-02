@@ -16,8 +16,25 @@ Account.prototype.save = function(callback) {
 		});
 	} else {
 		err = 'Element wanted';
+		callback(err);
 	}
 };
+
+Account.prototype.validate = function(callback) {
+	if(this.name && this.pass) {
+		var sql = "SELECT * FROM accounts WHERE name=? AND pass=?";
+		accountdb.query(sql, this.name, this.pass, function(err, rows) {
+			if(rows.length > 0) {
+				callback(err, rows[0]);
+			} else {
+				callback(err, null);
+			}
+		});
+	} else {
+		err = 'Element wanted';
+		callback(err, null);
+	}
+}
 
 Account.get = function(username, callback) {
 	if(username) {
@@ -32,5 +49,6 @@ Account.get = function(username, callback) {
 		});
 	} else {
 		err = 'Element wanted';
+		callback(err, null);
 	}
 };

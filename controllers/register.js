@@ -4,11 +4,11 @@ var crypto = require('crypto');
 module.exports = function(req, res) {
 	var input = req.body;
 	var md5 = crypto.createHash('md5');
-	var password = md5.update(input.password).digest('base64');
+	var password = md5.update(input.password).digest('hex').toUpperCase();
 
 	var newAccount = new Account({
 		name: input.username,
-		password: password
+		pass: password
 	});
 
 	Account.get(newAccount.name, function(err, account) {

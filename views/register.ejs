@@ -12,7 +12,7 @@
       .form-signin {
         max-width: 300px;
         padding: 19px 29px 29px;
-        margin: 100px auto 120px;
+        margin: 50px auto 70px;
         background-color: #fff;
         border: 1px solid #e5e5e5;
         -webkit-border-radius: 5px;
@@ -50,8 +50,8 @@
           <div class="nav-collapse"> 
             <ul class="nav"> 
               <li><a href="/">首页</a></li> 
-              <li class="active"><a href="/login">登入</a></li> 
-              <li><a href="/register"> 注册</a></li> 
+              <li><a href="/login">登入</a></li> 
+              <li class="active"><a href="/register"> 注册</a></li> 
             </ul> 
           </div> 
         </div> 
@@ -60,27 +60,32 @@
  
     <div id="container" class="container">
     	<form class="form-signin">
-        <fieldset> 
-          <legend>用户登录</legend> 
-          <div class="control-group">  
-             <label  class="control-label" for="username">用户名</label> 
-             <div class="controls">  
-               <input  type="text" class="input-xlarge" id="username" name="username" >
-             </div> 
-          </div> 
-          <div class="control-group">  
-             <label  class="control-label" for="password">口令</label>
-             <div class="controls">
-               <input  type="password" class="input-xlarge" id="password" name="password">
-             </div>
-          </div>
-          <label class="checkbox">
-            <input type="checkbox" value="remember-me">Remember me
-          </label>
-          <div class="form-actions" >  
-             <button type="submit" class="btn btn-large btn-primary" >登录</button> 
-          </div> 
-        </fieldset>
+    		<fieldset> 
+			    <legend>用户注册</legend> 
+			    <div class="control-group">  
+			       <label  class="control-label" for="username">用户名</label> 
+			       <div class="controls">  
+			         <input  type="text" class="input-xlarge" id="username" name="username" >  
+			         <p class="help-block">你的账户名称，用于登录和显示。</p> 
+			       </div> 
+			    </div> 
+			    <div class="control-group">  
+			       <label  class="control-label" for="password">口令</label>  
+			       <div class="controls">  
+			         <input  type="password" class="input-xlarge" id="password" name="password">  
+			       </div>
+			    </div> 
+			    <div class="control-group">  
+			       <label  class="control-label" for="password-repeat">重复输入口令</label>  
+			       <div class="controls">  
+			         <input  type="password" class="input-xlarge" id="password-repeat"  
+			           name="password-repeat" >  
+			       </div> 
+			    </div> 
+			    <div class="form-actions" >  
+			       <button type="submit" class="btn btn-large btn-primary" >注册</button> 
+			    </div> 
+		  </fieldset>
       	</form>
     	<hr /> 
 		<footer>

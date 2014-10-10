@@ -10,7 +10,7 @@ module.exports = function(req, res) {
 		name: input.username,
 		pass: password
 	});
-
+	
 	Account.get(newAccount.name, function(err, account) {
 		if(account) {
 			err = 'Username already exist.';

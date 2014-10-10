@@ -8,8 +8,6 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var config = require('./config');
 
-var routes = require('./routes/index');
-
 var app = express();
 
 // view engine setup
@@ -30,8 +28,13 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(routes);
-app.use(require('./routes/dogecoin'));
+app.use(function(req, res, next) {
+    res.locals.user = req.session.user;
+    next();
+});
+
+app.use(require('./routes/index'));
+app.use(require('./routes/platform'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -63,6 +66,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;

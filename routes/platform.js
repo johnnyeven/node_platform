@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/dogecoin', require('../controllers/dogecoin'));
+router.get('/platform', require('../controllers/platform'));
 
 module.exports = router;

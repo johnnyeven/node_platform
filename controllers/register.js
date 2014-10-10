@@ -1,7 +1,7 @@
 var Account = require('../modules/account');
 var crypto = require('crypto');
 
-module.exports = function(req, res) {
+module.exports = function(req, res, next) {
 	var input = req.body;
 	var md5 = crypto.createHash('md5');
 	var password = md5.update(input.password).digest('hex').toUpperCase();
@@ -13,21 +13,23 @@ module.exports = function(req, res) {
 	
 	Account.get(newAccount.name, function(err, account) {
 		if(account) {
-			err = 'Username already exist.';
+			err.message = 'Username already exist.';
 		}
 		if(err) {
-			//req.flash('error', err);
-			console.log(err);
-			return res.redirect('/register123');
+			err.status = 200;
+			err.redirect = '/register';
+			next(err, req, res);
+			return;
 		}
 
 		newAccount.save(function(err) {
 			if(err) {
-				//req.flash('error', err);
-				return res.redirect('/register');
+				err.status = 500;
+				next(err, req, res);
+				return;
 			}
-			//req.flash('success', 'Register success!');
-			res.redirect('/');
+			req.session.user = newAccount;
+			res.redirect('/platform');
 		});
 	});
 };

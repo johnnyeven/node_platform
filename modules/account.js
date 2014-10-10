@@ -23,7 +23,7 @@ Account.prototype.save = function(callback) {
 Account.prototype.validate = function(callback) {
 	if(this.name && this.pass) {
 		var sql = "SELECT * FROM accounts WHERE name=? AND pass=?";
-		accountdb.query(sql, this.name, this.pass, function(err, rows) {
+		accountdb.query(sql, [this.name, this.pass], function(err, rows) {
 			if(rows.length > 0) {
 				callback(err, rows[0]);
 			} else {

@@ -8,5 +8,11 @@ module.exports = {
 		user: 'root',
 		password: '84@41%%wi96^4',
 		database: 'profzone_accountdb'
+	},
+	dogecoind: {
+		rpchost: 'localhost',
+		rpcport: 22555,
+		rpcuser: 'doge',
+		rpcpassword: 'wow'
 	}
 };

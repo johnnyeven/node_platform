@@ -13,7 +13,10 @@ module.exports = function(req, res, next) {
 	
 	Account.get(newAccount.name, function(err, account) {
 		if(account) {
-			err.message = 'Username already exist.';
+			var err = {
+				status: 200,
+				message: 'Username already exist.'
+			};
 		}
 		if(err) {
 			err.status = 200;

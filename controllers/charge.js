@@ -7,13 +7,15 @@ module.exports = function(req, res, next) {
 			user: config.dogecoind.rpcuser,
 			pass: config.dogecoind.rpcpassword
 		});
-		dogecoin.getBalance(function(err, b) {
+		dogecoin.getNewAddress(req.session.user.name, function(err, addr) {
 			if(err) {
 				err.status = 500;
         		next(err, req, res);
         		return;
 			}
-			res.render('platform', {});
+			res.render('charge', {
+				address: addr
+			});
 		});
 	} else {
 		res.redirect('/login');

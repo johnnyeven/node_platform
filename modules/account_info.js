@@ -9,7 +9,7 @@ function AccountInfo(account, charge_address, charge_expire) {
 module.exports = AccountInfo;
 
 AccountInfo.prototype.save = function(callback) {
-	var collection = db.collection('account_info');
+	var collection = mongodb.collection('account_info');
 	var data = {
 		account: this.account,
 		charge_address: this.charge_address,
@@ -27,7 +27,7 @@ AccountInfo.prototype.save = function(callback) {
 };
 
 AccountInfo.get = function(params, callback) {
-	var collection = db.collection('account_charge_address');
+	var collection = mongodb.collection('account_charge_address');
 	collection.find(params).toArray(function(err, docs) {
 		return callback(err, docs);
 	});

@@ -1,4 +1,29 @@
 module.exports = function(req, res, next) {
+	var getAndSaveNewAddress = function(username, expire) {
+		dogecoin.getNewAddress(username, function(err, addr) {
+			if(err) {
+				err.status = 500;
+				next(err, req, res);
+				return;
+			}
+			var account = new AccountInfo(
+				username,
+				addr,
+				expire
+			);
+			account.save(function(err, docs) {
+				if(!err) {
+					res.render('charge', {
+						address: addr
+					});
+				} else {
+					err.status = 500;
+					next(err, req, res);
+				}
+			});
+		});
+	};
+	
 	if(req.session.user) {
 		var config = require('../config');
 		var dogecoin = require('node-dogecoin')({
@@ -12,46 +37,24 @@ module.exports = function(req, res, next) {
 		var param = {
 			account: req.session.user.name
 		};
-		AccountInfo.get(param, function(err, docs) {
+		AccountInfo.get(param, function(err, doc) {
 			if(!err) {
-				if(docs.length > 0) {
-					var info = docs[0];
-					if(info.charge_expire) {
-						dogecoin.getNewAddress(req.session.user.name, function(err, addr) {
-							if(err) {
-								err.status = 500;
-				        		next(err, req, res);
-				        		return;
-							}
-							var account = new AccountInfo(
-								req.session.user,
-								addr,
-								0
-							);
-							account.save(function(err, docs) {
-								if(!err) {
-									res.render('charge', {
-										address: addr
-									});
-								} else {
-									err.status = 500;
-									next(err, req, res);
-								}
-							});
+				var currentTime = Math.floor((new Date()).getTime() / 1000);
+				if(doc) {
+					if(doc.charge_expire >= currentTime + 1800) {
+						getAndSaveNewAddress(req.session.user.name, currentTime + 1800);
+					} else {
+						res.render('charge', {
+							address: doc.charge_address
 						});
 					}
 				} else {
-					dogecoin.getNewAddress(req.session.user.name, function(err, addr) {
-						if(err) {
-							err.status = 500;
-			        		next(err, req, res);
-			        		return;
-						}
-						res.render('charge', {
-							address: addr
-						});
-					});
+					getAndSaveNewAddress(req.session.user.name, currentTime + 1800);
 				}
+			} else {
+				err.status = 500;
+				next(err, req, res);
+				return;
 			}
 		});
 	} else {

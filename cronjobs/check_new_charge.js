@@ -13,3 +13,4 @@ var dogecoin = require('node-dogecoin')({
 	user: config.dogecoind.rpcuser,
 	pass: config.dogecoind.rpcpassword
 });
+

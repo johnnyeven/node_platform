@@ -6,7 +6,7 @@
  */
 
 var config = require('../config');
-var mongodb = require('../modules/db');
+//var mongodb = require('../modules/db');
 var dogecoin = require('node-dogecoin')({
 	host: config.dogecoind.rpchost,
 	port: config.dogecoind.rpcport,
@@ -14,3 +14,21 @@ var dogecoin = require('node-dogecoin')({
 	pass: config.dogecoind.rpcpassword
 });
 
+/*
+* trans(Array) construct:
+* account
+* address
+* category
+* amount
+* confirmations
+* blockhash
+* blockindex
+* blocktime
+* txid
+* walletconflicts
+* time
+* timereceived
+*/
+dogecoin.listtransactions('oldfoxlyw', function(err, trans) {
+	
+});

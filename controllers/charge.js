@@ -1,5 +1,5 @@
 module.exports = function(req, res, next) {
-	var getAndSaveNewAddress = function(username, expire) {
+	var getAndSaveNewAddress = function(username, expire, trans_offset) {
 		dogecoin.getNewAddress(username, function(err, addr) {
 			if(err) {
 				err.status = 500;
@@ -9,7 +9,8 @@ module.exports = function(req, res, next) {
 			var account = new AccountInfo(
 				username,
 				addr,
-				expire
+				expire,
+				trans_offset
 			);
 			account.save(function(err, docs) {
 				if(!err) {
@@ -42,14 +43,14 @@ module.exports = function(req, res, next) {
 				var currentTime = Math.floor((new Date()).getTime() / 1000);
 				if(doc) {
 					if(doc.charge_expire >= currentTime + 1800) {
-						getAndSaveNewAddress(req.session.user.name, currentTime + 1800);
+						getAndSaveNewAddress(req.session.user.name, currentTime + 1800, doc.charge_trans_offset);
 					} else {
 						res.render('charge', {
 							address: doc.charge_address
 						});
 					}
 				} else {
-					getAndSaveNewAddress(req.session.user.name, currentTime + 1800);
+					getAndSaveNewAddress(req.session.user.name, currentTime + 1800, 0);
 				}
 			} else {
 				err.status = 500;

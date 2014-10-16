@@ -1,9 +1,10 @@
 var mongodb = require('./db');
 
-function AccountInfo(account, charge_address, charge_expire) {
+function AccountInfo(account, charge_address, charge_expire, charge_trans_offset) {
 	this.account = account;
 	this.charge_address = charge_address;
 	this.charge_expire = charge_expire;
+	this.charge_trans_offset = charge_trans_offset;
 }
 
 module.exports = AccountInfo;
@@ -19,7 +20,8 @@ AccountInfo.prototype.save = function(callback) {
 		var data = {
 			account: thisPtr.account,
 			charge_address: thisPtr.charge_address,
-			charge_expire: thisPtr.charge_expire
+			charge_expire: thisPtr.charge_expire,
+			charge_trans_offset: thisPtr.charge_trans_offset
 		};
 		var param = {
 			account: thisPtr.account

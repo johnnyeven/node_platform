@@ -6,12 +6,27 @@
  */
 
 var config = require('../config');
-var mongodb = require('../modules/db');
+var mongoose = require('mongoose');
 var dogecoin = require('node-dogecoin')({
 	host: config.dogecoind.rpchost,
 	port: config.dogecoind.rpcport,
 	user: config.dogecoind.rpcuser,
 	pass: config.dogecoind.rpcpassword
+});
+mongoose.connect('mongodb://' + config.host + '/' + config.db);
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+	var AccountInfo = require('../modules/AccountInfo');
+	var aInfo = new AccountInfo({
+		account: "test",
+	});
+	aInfo.save(function(err, doc, numberAffected) {
+		if(err) return console.error(err.message);
+		console.log(doc);
+		db.close();
+	});
 });
 
 /*
@@ -29,13 +44,15 @@ var dogecoin = require('node-dogecoin')({
 * time
 * timereceived
 */
+/*
 mongodb.open(function(err, db) {
 	var param = {
 		account: 'oldfoxlyw'
 	};
 	db.findOne(param, function(err, doc) {
-		dogecoin.listtransactions('oldfoxlyw', function(err, trans) {
+		dogecoin.listtransactions('oldfoxlyw', 50, doc.charge_trans_offset, function(err, trans) {
 
 		});
 	});
 });
+*/

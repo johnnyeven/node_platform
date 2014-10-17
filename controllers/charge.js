@@ -1,27 +1,37 @@
 module.exports = function(req, res, next) {
-	var getAndSaveNewAddress = function(username, expire, trans_offset) {
+	var getAndSaveNewAddress = function(aInfo) {
 		dogecoin.getNewAddress(username, function(err, addr) {
 			if(err) {
 				err.status = 500;
 				next(err, req, res);
 				return;
 			}
-			var account = new AccountInfo(
-				username,
-				addr,
-				expire,
-				trans_offset
-			);
-			account.save(function(err, docs) {
-				if(!err) {
-					res.render('charge', {
-						address: addr
-					});
-				} else {
-					err.status = 500;
-					next(err, req, res);
-				}
-			});
+			if(aInfo) {
+				aInfo.update(function(err, doc, numberAffected) {
+					db.close();
+				});
+				res.render('charge', {
+					address: addr
+				});
+			} else {
+				aInfo = new AccountInfo({
+					account: req.session.user.name,
+					charge_address: addr,
+					charge_expire: currentTime + 1800,
+					charge_trans_offset: 0
+				});
+				aInfo.save(function(err, doc, numberAffected) {
+					db.close();
+					if(!err) {
+						res.render('charge', {
+							address: addr
+						});
+					} else {
+						err.status = 500;
+						next(err, req, res);
+					}
+				});
+			}
 		});
 	};
 	
@@ -33,30 +43,37 @@ module.exports = function(req, res, next) {
 			user: config.dogecoind.rpcuser,
 			pass: config.dogecoind.rpcpassword
 		});
-		var mongodb = require('../modules/db');
-		var AccountInfo = require('../modules/account_info');
+		var AccountInfo = require('../modules/AccountInfo');
 		var param = {
-			account: req.session.user.name
+			'account': req.session.user.name
 		};
-		AccountInfo.get(param, function(err, doc) {
-			if(!err) {
-				var currentTime = Math.floor((new Date()).getTime() / 1000);
-				if(doc) {
-					if(doc.charge_expire >= currentTime + 1800) {
-						getAndSaveNewAddress(req.session.user.name, currentTime + 1800, doc.charge_trans_offset);
+		var mongoose = require('mongoose');
+		mongoose.connect('mongodb://' + config.host + '/' + config.db);
+		var db = mongoose.connection;
+		db.on('error', console.error.bind(console, 'connection error:'));
+		db.once('open', function() {
+			AccountInfo.findOne(param, function(err, doc) {
+				if(!err) {
+					var currentTime = Math.floor((new Date()).getTime() / 1000);
+					if(doc) {
+						if(doc.charge_expire >= currentTime + 1800) {
+							doc.charge_expire = currentTime + 1800;
+							getAndSaveNewAddress(doc);
+						} else {
+							db.close();
+							res.render('charge', {
+								address: doc.charge_address
+							});
+						}
 					} else {
-						res.render('charge', {
-							address: doc.charge_address
-						});
+						getAndSaveNewAddress(null);
 					}
 				} else {
-					getAndSaveNewAddress(req.session.user.name, currentTime + 1800, 0);
+					err.status = 500;
+					next(err, req, res);
+					return;
 				}
-			} else {
-				err.status = 500;
-				next(err, req, res);
-				return;
-			}
+			});
 		});
 	} else {
 		res.redirect('/login');

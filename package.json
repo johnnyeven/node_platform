@@ -17,6 +17,7 @@
     "debug": "~2.0.0",
     "ejs": "~0.8.5",
     "mongodb": ">= 0.9.9",
+    "mongoose": "*",
     "mysql": "*",
     "node-dogecoin": "*"
   },

@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
 					account: username
 				}, {
 					dogecoin: {
-						amount: aInfo.dogecoin.amount
+						amount: aInfo.dogecoin.amount,
 						charge_address: aInfo.dogecoin.charge_address,
 						charge_expire: aInfo.dogecoin.charge_expire,
 						charge_trans_offset: aInfo.dogecoin.charge_trans_offset

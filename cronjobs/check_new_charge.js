@@ -19,44 +19,49 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
 	var AccountInfo = require('../modules/AccountInfo');
+	var AssetsLog = require('../modules/AssetsLog');
 	var userName = 'oldfoxlyw';
 	AccountInfo.findOne({
 		account: userName
 	}).exec(function(err, doc) {
-		db.close();
 		dogecoin.listtransactions(userName, 50, doc.dogecoin.charge_trans_offset, function(err, trans) {
 			var length = trans.length;
 			if(length > 0) {
+				for(var i in trans) {
+					if(trans[i].category == 'receive' && trans[i].confirmations >= 6) {
+						doc.dogecoin.amount += trans[i].amount;
+						var assetLog = new AssetsLog({
+							account: userName,
+							category: 1,
+							type: 1,
+							address: trans[i].address,
+							amount: trans[i].amount,
+							time: trans[i].time
+						});
+						assetLog.save(function(err, doc, numberAffected) {
+							if(!err) {
+								console.log('processed one transaction: ' + trans[i]);
+							}
+						});
+					}
+				}
 				doc.dogecoin.charge_trans_offset += length;
+				AccountInfo.update({
+					account: userName
+				}, {
+					dogecoin: {
+						amount: doc.dogecoin.amount,
+						charge_address: doc.dogecoin.charge_address,
+						charge_expire: doc.dogecoin.charge_expire,
+						charge_trans_offset: doc.dogecoin.charge_trans_offset
+					}
+				}, function(err, numberAffected) {
+					console.log(numberAffected);
+					db.close();
+				});
+			} else {
+				db.close();
 			}
 		});
 	});
 });
-
-/*
-* trans(Array) construct:
-* account
-* address
-* category
-* amount
-* confirmations
-* blockhash
-* blockindex
-* blocktime
-* txid
-* walletconflicts
-* time
-* timereceived
-*/
-/*
-mongodb.open(function(err, db) {
-	var param = {
-		account: 'oldfoxlyw'
-	};
-	db.findOne(param, function(err, doc) {
-		dogecoin.listtransactions('oldfoxlyw', 50, doc.charge_trans_offset, function(err, trans) {
-
-		});
-	});
-});
-*/

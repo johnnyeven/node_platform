@@ -19,13 +19,17 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
 	var AccountInfo = require('../modules/AccountInfo');
-	var aInfo = new AccountInfo({
-		account: "test",
-	});
-	aInfo.save(function(err, doc, numberAffected) {
-		if(err) return console.error(err.message);
-		console.log(doc);
+	var userName = 'oldfoxlyw';
+	AccountInfo.findOne({
+		account: userName
+	}).exec(function(err, doc) {
 		db.close();
+		dogecoin.listtransactions(userName, 50, doc.dogecoin.charge_trans_offset, function(err, trans) {
+			var length = trans.length;
+			if(length > 0) {
+				doc.dogecoin.charge_trans_offset += length;
+			}
+		});
 	});
 });
 

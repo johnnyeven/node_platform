@@ -1,5 +1,5 @@
 module.exports = function(req, res, next) {
-	var getAndSaveNewAddress = function(aInfo) {
+	var getAndSaveNewAddress = function(username, aInfo) {
 		dogecoin.getNewAddress(username, function(err, addr) {
 			if(err) {
 				err.status = 500;
@@ -7,18 +7,31 @@ module.exports = function(req, res, next) {
 				return;
 			}
 			if(aInfo) {
-				aInfo.update(function(err, doc, numberAffected) {
+				AccountInfo.update({
+					account: username
+				}, {
+					dogecoin: {
+						amount: aInfo.dogecoin.amount
+						charge_address: aInfo.dogecoin.charge_address,
+						charge_expire: aInfo.dogecoin.charge_expire,
+						charge_trans_offset: aInfo.dogecoin.charge_trans_offset
+					}
+				}, function(err, numberAffected) {
 					db.close();
-				});
-				res.render('charge', {
-					address: addr
+					res.render('charge', {
+						address: addr
+					});
 				});
 			} else {
+				var currentTime = Math.floor((new Date()).getTime() / 1000);
 				aInfo = new AccountInfo({
 					account: req.session.user.name,
-					charge_address: addr,
-					charge_expire: currentTime + 1800,
-					charge_trans_offset: 0
+					dogecoin: {
+						amount: 0,
+						charge_address: addr,
+						charge_expire: currentTime + 1800,
+						charge_trans_offset: 0
+					}
 				});
 				aInfo.save(function(err, doc, numberAffected) {
 					db.close();
@@ -45,7 +58,7 @@ module.exports = function(req, res, next) {
 		});
 		var AccountInfo = require('../modules/AccountInfo');
 		var param = {
-			'account': req.session.user.name
+			account: req.session.user.name
 		};
 		var mongoose = require('mongoose');
 		mongoose.connect('mongodb://' + config.host + '/' + config.db);
@@ -56,17 +69,17 @@ module.exports = function(req, res, next) {
 				if(!err) {
 					var currentTime = Math.floor((new Date()).getTime() / 1000);
 					if(doc) {
-						if(doc.charge_expire >= currentTime + 1800) {
-							doc.charge_expire = currentTime + 1800;
-							getAndSaveNewAddress(doc);
-						} else {
+						if(doc.dogecoin.charge_expire >= currentTime) {
 							db.close();
 							res.render('charge', {
-								address: doc.charge_address
+								address: doc.dogecoin.charge_address
 							});
+						} else {
+							doc.dogecoin.charge_expire = currentTime + 1800;
+							getAndSaveNewAddress(doc.account, doc);
 						}
 					} else {
-						getAndSaveNewAddress(null);
+						getAndSaveNewAddress(req.session.user.name, null);
 					}
 				} else {
 					err.status = 500;

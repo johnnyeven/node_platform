@@ -40,7 +40,7 @@ db.once('open', function() {
 						});
 						assetLog.save(function(err, doc, numberAffected) {
 							if(!err) {
-								console.log('processed one transaction: ' + trans[i]);
+								console.log(trans[i]);
 							}
 						});
 					}
